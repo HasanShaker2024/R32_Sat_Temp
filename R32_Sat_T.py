@@ -34,7 +34,7 @@ model = LinearRegression()
 model.fit(X_poly, y)
 
 # --- 3. User Input
-pressure_input = st.number_input("Enter Pressure (PSIG):", min_value=0.0, value=628.0, step=1.0)
+pressure_input = st.number_input("Enter Pressure (PSIG):", min_value=0.0, value=630.0, step=0.1)
 
 # --- 4. Predict
 input_poly = poly.transform(np.array([[pressure_input]]))
