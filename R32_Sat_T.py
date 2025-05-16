@@ -23,9 +23,9 @@ data = {
         37.8, 40.6, 43.3, 46.1, 48.9, 51.7, 54.4, 57.2, 60, 62.8, 65.6
     ]
 }
-#df = pd.DataFrame(data)
+df = pd.DataFrame(data)
 
-df=pd.csv_read_csv("R32_Sat_T.csv")
+#df=pd.csv_read_csv("R32_Sat_T.csv")
 
 # --- 2. Train a Polynomial Regression Model
 X = df[['Pressure']]
