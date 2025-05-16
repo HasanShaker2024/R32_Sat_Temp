@@ -6,7 +6,7 @@ from sklearn.preprocessing import PolynomialFeatures
 
 # Title
 st.title("🌡️ R32 Saturation Temperature Predictor")
-st.markdown("Dveloped by [Hasan Samir Hasan]")
+st.markdown("Developed by [Hasan Samir Hasan]")
 
 st.markdown("Enter a pressure (PSIG) to predict the saturation temperature (°C) using polynomial regression.")
 
