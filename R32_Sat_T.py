@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import StandardScaler
 
 # Title
 st.title("🌡️ R32 Saturation Temperature Predictor")
@@ -27,9 +28,11 @@ df = pd.DataFrame(data)
 # --- 2. Train a Polynomial Regression Model
 X = df[['Pressure']]
 y = df['SatTemp']
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 degree = 4  # You can try 3 or 5 if desired
 poly = PolynomialFeatures(degree=degree)
-X_poly = poly.fit_transform(X)
+X_poly = poly.fit_transform(X_scaled)
 model = LinearRegression()
 model.fit(X_poly, y)
 
