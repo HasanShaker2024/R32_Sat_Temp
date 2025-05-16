@@ -1,73 +1,61 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
+import numpy as np
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, r2_score
-import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
 
-# Load Data
-df = pd.read_csv('R32_P_T.csv')  # CSV should have columns: 'Pressure', 'SatTemp'
+# Title
+st.title("🌡️ R32 Saturation Temperature Predictor")
+st.markdown("Dveloped by [Hasan Samir Hasan]")
 
-# Features and Target
+st.markdown("Enter a pressure (PSIG) to predict the saturation temperature (°C) using polynomial regression.")
+
+# --- 1. Built-in R32 Pressure-Temperature Data
+data = {
+    "Pressure": [
+        11, 14.4, 18.2, 22.3, 26.8, 31.7, 37.1, 42.9, 49.3, 56.1, 63.5, 71.5, 80, 89.2,
+        99.1, 109.7, 121, 133, 145.9, 159.5, 174.1, 189.5, 205.8, 223.2, 241.5, 260.9,
+        281.3, 302.9, 325.7, 349.6, 374.9, 401.4, 429.3, 458.6, 489.4, 521.8, 555.7, 591.4, 628.8
+    ],
+    "SatTemp": [
+        -40, -37.2, -34.4, -31.7, -28.9, -26.1, -23.3, -20.6, -17.8, -15, -12.2, -9.4, -6.7,
+        -3.9, -1.1, 1.7, 4.4, 7.2, 10, 12.8, 15.6, 18.3, 21.1, 23.9, 26.7, 29.4, 32.2, 35,
+        37.8, 40.6, 43.3, 46.1, 48.9, 51.7, 54.4, 57.2, 60, 62.8, 65.6
+    ]
+}
+#df = pd.DataFrame(data)
+
+df=pd.csv_read_csv("R32_Sat_T.csv")
+
+# --- 2. Train a Polynomial Regression Model
 X = df[['Pressure']]
 y = df['SatTemp']
-
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Normalize the Pressure data
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
-
-# Polynomial Transformation
-degree = 4
+degree = 4  # You can try 3 or 5 if desired
 poly = PolynomialFeatures(degree=degree)
-X_train_poly = poly.fit_transform(X_train_scaled)
-X_test_poly = poly.transform(X_test_scaled)
-
-# Train Model
+X_poly = poly.fit_transform(X)
 model = LinearRegression()
-model.fit(X_train_poly, y_train)
+model.fit(X_poly, y)
 
-# Evaluate
-y_pred = model.predict(X_test_poly)
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
+# --- 3. User Input
+pressure_input = st.number_input("Enter Pressure (PSIG):", min_value=0.0, value=628.0, step=1.0)
 
-# Streamlit UI
-st.set_page_config(page_title="R32 Saturation Temp Predictor", layout="centered")
-st.title("🌡️ R32 Saturation Temperature Predictor")
-st.markdown("Enter a pressure (in **PSIG**) to predict the saturation temperature.")
+# --- 4. Predict
+input_poly = poly.transform(np.array([[pressure_input]]))
+predicted_temp = model.predict(input_poly)[0]
+st.success(f"Predicted Saturation Temperature: {predicted_temp:.2f} °C")
 
-# Input
-input_pressure = st.number_input("Enter Pressure (PSIG)", min_value=0.0, max_value=700.0, step=1.0)
+# --- 5. Optional: Show Curve
+if st.checkbox("📈 Show Curve"):
+    import matplotlib.pyplot as plt
 
-if input_pressure:
-    # Transform and predict
-    input_scaled = scaler.transform(np.array([[input_pressure]]))
-    input_poly = poly.transform(input_scaled)
-    predicted_temp = model.predict(input_poly)[0]
-    st.success(f"🌡️ Predicted Saturation Temp at {input_pressure:.1f} PSIG: **{predicted_temp:.2f} °C**")
+    X_range = np.linspace(X.min(), X.max(), 500).reshape(-1, 1)
+    y_range = model.predict(poly.transform(X_range))
 
-# Show Evaluation
-st.subheader("📈 Model Performance")
-st.write(f"**Degree:** {degree}")
-st.write(f"**R² Score:** {r2:.4f}")
-st.write(f"**Mean Squared Error:** {mse:.4f}")
-
-# Plot the fitted curve
-st.subheader("🔍 Curve Fit Visualization")
-
-X_range = np.linspace(X.min(), X.max(), 300).reshape(-1, 1)
-X_range_scaled = scaler.transform(X_range)
-X_range_poly = poly.transform(X_range_scaled)
-y_range_pred = model.predict(X_range_poly)
-
-fig, ax = plt.subplots()
-ax.scatter(X, y, color='blue', label='Actual Data')
-ax.plot(X_range, y_range_pred, color='red', label='Polynomial Fit')
-ax.set_xlabel("Pressure (PSIG)")
-ax.set_ylabel("Saturation Temperature (°C)_
+    fig, ax = plt.subplots()
+    ax.scatter(X, y, color='blue', label='Data')
+    ax.plot(X_range, y_range, color='red', label='Polynomial Fit')
+    ax.set_xlabel('Pressure (PSIG)')
+    ax.set_ylabel('Saturation Temp (°C)')
+    ax.legend()
+    ax.grid(True)
+    st.pyplot(fig)
