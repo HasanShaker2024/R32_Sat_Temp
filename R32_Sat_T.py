@@ -24,9 +24,6 @@ data = {
     ]
 }
 df = pd.DataFrame(data)
-
-#df=pd.csv_read_csv("R32_Sat_T.csv")
-
 # --- 2. Train a Polynomial Regression Model
 X = df[['Pressure']]
 y = df['SatTemp']
