@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 
 # Title
 st.title("🌡️ R32 Saturation Temperature Predictor")
-st.markdown("Developed By: Hasan Samir")
+st.markdown("Developed By: Hasan Samir Hasan")
 st.markdown("Enter a pressure (PSIG) to predict the saturation temperature (°C) using polynomial regression.")
 
 # --- 1. Built-in R32 Pressure-Temperature Data
